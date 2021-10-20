@@ -1,0 +1,28 @@
+﻿<div class="form-group">
+    <label>Name</label>
+    <input type="text" [(ngModel)]="userName" class="form-control" required/>
+</div>
+<div class="form-group">
+    <label>Selected Task</label>
+    <select class="form-control" name="selectedTask" (change)="chooseTask()" [(ngModel)]="selectedTask">
+        <option *ngFor="let taskName of taskNames">
+            {{taskName}}
+        </option>
+    </select>
+</div>
+<div class="form-group">
+    <label>Description</label>
+    <div class="form-control">
+        {{contestTask.description}}
+    </div>
+</div>
+<div class="form-group">
+    <label>Solution code</label>
+    <textarea [(ngModel)]="code" maxlength="2000" rows="15" class="form-control"></textarea>
+</div>
+<div class="form-group" style="display: inline-block">
+    <input type="button" value="RUN" (click)="saveResult()" class="btn btn-success" />
+    <div *ngIf="isRunned">
+        <div [ngSwitch]="isSuccess" style="font-size: 24px;">{{info}}</div>
+    </div>
+</div>

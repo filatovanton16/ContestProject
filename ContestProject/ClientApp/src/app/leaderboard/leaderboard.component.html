@@ -1,0 +1,16 @@
+﻿<table class='table table-striped' aria-labelledby="tableLabel">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Success solutions</th>
+            <th>Tasks</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let userTaskGroup of userTaskGroups">
+            <td>{{ userTaskGroup.name }}</td>
+            <td>{{ userTaskGroup.solutionsNumber }}</td>
+            <td>{{ userTaskGroup.allTasksString }}</td>
+        </tr>
+    </tbody>
+</table>

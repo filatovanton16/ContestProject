@@ -1,7 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UserTaskCode } from './user-task-code';
-import { ContestTask } from './contest-task';
 
 @Injectable()
 export class ContestDataService {

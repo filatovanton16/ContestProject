@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using ContestProject.Models;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System;
+using Newtonsoft.Json;
 
 namespace ContestProject.Controllers
 {
@@ -11,10 +13,14 @@ namespace ContestProject.Controllers
     [Route("api/contest")]
     public class ContestController : Controller
     {
-        ApplicationContext db;
-        public ContestController(ApplicationContext context)
+        private ApplicationContext db;
+
+        private IJDoodleService _JDoodleService;
+
+        public ContestController(ApplicationContext context, IJDoodleService jDoodleService)
         {
             db = context;
+            _JDoodleService = jDoodleService;
             FillDatabase();
         }
         [HttpGet]
@@ -25,51 +31,48 @@ namespace ContestProject.Controllers
         }
 
         [HttpGet("{taskName}")]
-        public ContestTask Get(string taskName)
+        public string Get(string taskName)
         {
             ContestTask contestTask = db.ContestTasks.FirstOrDefault(contestTask => contestTask.Name == taskName);
-            return contestTask;
+            return JsonConvert.SerializeObject(contestTask.Description);
         }
 
         [HttpPost]
-        public async Task<bool> Post(UserTaskCode userTaskCode)
+        public async Task<string> Post(UserTaskCode userTaskCode)
         {
-            bool isSuccess = await JDoodleConnector.TryCompilate(userTaskCode);
-            if (isSuccess)
+            string result;
+            try
             {
+                ContestTask contestTask = db.ContestTasks.FirstOrDefault(contestTask => contestTask.Name == userTaskCode.TaskName);
+                dynamic response = await _JDoodleService.TryCompilate(userTaskCode.Code, contestTask.InputParameter);
 
-                ContestTask contestTask = db.ContestTasks.FirstOrDefault(contestTask => contestTask.Name == userTaskCode.Task);
-
-                User user = db.Users.FirstOrDefault(user => user.Name == userTaskCode.Name);
-                if (user == null)
+                if (response.statusCode == "200")
                 {
-                    user = new User { Name = userTaskCode.Name };
-                    db.Users.Add(user);
+                    SaveUserTaskToDB(userTaskCode, contestTask);
+                    try
+                    {
+                        result = Convert.ToInt32(response.output) == contestTask.OutputParameter ?
+                                                "Success! Memory: " + response.memory + " CPU: " + response.cpuTime :
+                                                "Wrong:(";
+                    }
+                    catch
+                    {
+                        result = "Error: " + response.output;
+                    }
                 }
-
-                UserTask userTask = db.UserTasks.FirstOrDefault(userTask => userTask.User.Name == userTaskCode.Name && userTask.Task.Name == userTaskCode.Task);
-                if (userTask == null)
+                else
                 {
-                    db.UserTasks.Add(new UserTask { User = user, Task = contestTask });
+                    result = "Error: " + response.error;
                 }
-
-                db.SaveChanges();
             }
-
-            return isSuccess;
+            catch
+            {
+                result = "Something went wrong. Please try again.";
+            }
+            return JsonConvert.SerializeObject(result);
         }
 
-        //[HttpPost]
-        //public string Post(string dgf)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        return "ok";
-        //    }
-        //    return "neok";
-        //}
-
-        private void FillDatabase() //If the database empty. If not empty => this code could be deleted
+        private void FillDatabase() //In case if the database empty, instead of migration.
         {
             ContestTask[] initialContestTasks = new ContestTask[4]
             {
@@ -107,5 +110,24 @@ namespace ContestProject.Controllers
 
             db.SaveChanges();
         }
+
+        private void SaveUserTaskToDB(UserTaskCode userTaskCode, ContestTask contestTask)
+        {
+            User user = db.Users.FirstOrDefault(user => user.Name == userTaskCode.UserName);
+            if (user == null)
+            {
+                user = new User { Name = userTaskCode.UserName };
+                db.Users.Add(user);
+            }
+
+            UserTask userTask = db.UserTasks.FirstOrDefault(userTask => userTask.User.Name == userTaskCode.UserName && userTask.Task.Name == userTaskCode.TaskName);
+            if (userTask == null)
+            {
+                db.UserTasks.Add(new UserTask { User = user, Task = contestTask });
+            }
+
+            db.SaveChanges();
+        }
+
     }
 }

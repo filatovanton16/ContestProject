@@ -8,32 +8,27 @@ import { Component } from '@angular/core';
 let ContestComponent = class ContestComponent {
     constructor(dataService) {
         this.dataService = dataService;
-        this.userTaskCode = { name: "", task: "", code: "", inputParameter: 0, outputParameter: 0 };
-        this.contestTask = { task: "", description: "", inputParameter: 0, outputParameter: 0 };
-        this.userName = "";
-        this.selectedTask = "TheSimpliestTask";
-        this.code = "public static int MyMethod(int input) {\nreturn 5 * input;\n}";
+        this.initCode = "public static int MyMethod(int input) {\nreturn 1;\n}";
         this.isRunned = false;
+        this.runTouched = false;
     }
     ngOnInit() {
-        this.dataService.getTaskNames().subscribe((data) => this.taskNames = data);
-        this.dataService.getContestTask(this.selectedTask).subscribe((data) => this.contestTask = data);
+        this.dataService.getTaskNames().subscribe((data) => {
+            this.taskNames = data;
+            this.userTaskCode = { userName: "", taskName: data[0], code: this.initCode };
+            this.dataService.getContestTask(this.userTaskCode.taskName).subscribe((data) => this.description = data);
+        });
     }
     chooseTask() {
-        this.dataService.getContestTask(this.selectedTask).subscribe((data) => this.contestTask = data);
+        this.dataService.getContestTask(this.userTaskCode.taskName).subscribe((data) => this.description = data);
     }
     saveResult() {
+        this.runTouched = true;
+        if (this.userTaskCode.userName == "")
+            return;
         this.isRunned = true;
         this.info = "WAIT...";
-        this.userTaskCode = { name: this.userName, task: this.selectedTask, code: this.code, inputParameter: this.contestTask.inputParameter, outputParameter: this.contestTask.outputParameter };
-        this.dataService.addUserTask(this.userTaskCode).subscribe((data) => {
-            if (data) {
-                this.info = "!!!SUCCESS!!!";
-            }
-            else {
-                this.info = "WRONG :(";
-            }
-        });
+        this.dataService.addUserTask(this.userTaskCode).subscribe((data) => { this.info = data; });
     }
 };
 ContestComponent = __decorate([

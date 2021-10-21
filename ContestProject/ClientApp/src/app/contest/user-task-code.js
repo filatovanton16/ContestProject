@@ -1,10 +1,8 @@
 export class UserTaskCode {
-    constructor(name, task, code, inputParameter, outputParameter) {
-        this.name = name;
-        this.task = task;
+    constructor(userName, taskName, code) {
+        this.userName = userName;
+        this.taskName = taskName;
         this.code = code;
-        this.inputParameter = inputParameter;
-        this.outputParameter = outputParameter;
     }
 }
 //# sourceMappingURL=user-task-code.js.map

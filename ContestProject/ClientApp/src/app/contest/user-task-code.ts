@@ -1,8 +1,6 @@
 ﻿export class UserTaskCode {
     constructor(
-        public name?: string,
-        public task?: string,
-        public code?: string,
-        public inputParameter?: number,
-        public outputParameter?: number) { }
+        public userName?: string,
+        public taskName?: string,
+        public code?: string) { }
 }

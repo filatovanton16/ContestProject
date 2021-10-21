@@ -1,10 +1,15 @@
 ﻿<div class="form-group">
     <label>Name</label>
-    <input type="text" [(ngModel)]="userName" class="form-control" required/>
+    <input type="text" name="name" [(ngModel)]="userTaskCode.userName" #name="ngModel" class="form-control" required />
+    <div *ngIf="name.invalid && (name.dirty || name.touched || runTouched)" class="alert">
+        <div *ngIf="name.errors?.required">
+            Name is required.
+        </div>
+    </div>
 </div>
 <div class="form-group">
     <label>Selected Task</label>
-    <select class="form-control" name="selectedTask" (change)="chooseTask()" [(ngModel)]="selectedTask">
+    <select class="form-control" name="selectedTask" (change)="chooseTask()" [(ngModel)]="userTaskCode.taskName">
         <option *ngFor="let taskName of taskNames">
             {{taskName}}
         </option>
@@ -13,16 +18,16 @@
 <div class="form-group">
     <label>Description</label>
     <div class="form-control">
-        {{contestTask.description}}
+        {{description}}
     </div>
 </div>
 <div class="form-group">
     <label>Solution code</label>
-    <textarea [(ngModel)]="code" maxlength="2000" rows="15" class="form-control"></textarea>
+    <textarea [(ngModel)]="userTaskCode.code" maxlength="2000" rows="15" class="form-control"></textarea>
 </div>
 <div class="form-group" style="display: inline-block">
     <input type="button" value="RUN" (click)="saveResult()" class="btn btn-success" />
     <div *ngIf="isRunned">
-        <div [ngSwitch]="isSuccess" style="font-size: 24px;">{{info}}</div>
+        <div style="font-size: 24px;">{{info}}</div>
     </div>
 </div>

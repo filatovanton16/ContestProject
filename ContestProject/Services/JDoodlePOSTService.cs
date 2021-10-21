@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -9,7 +7,7 @@ namespace ContestProject
 {
     public class JDoodlePOSTObject
     {
-        public string clientId = "2dc5dafe92194a5629efb80069d583a1";   //Put to the Config
+        public string clientId = "2dc5dafe92194a5629efb80069d583a1";   
         public string clientSecret = "b5804f1b2a42df4a99afe3774e32d11fe59be944596b168ed9947e186514fb1";
         public string stdin;
         public string language = "java";
@@ -18,14 +16,12 @@ namespace ContestProject
         public JDoodlePOSTObject(string _script, int _stdin)
         {
             stdin = _stdin.ToString();
-            script = _script.Replace("\n", "").Replace("\r", "");
-            script = Helper.ReduceSpaces(script);
+            script = _script;
         }
     }
 
-    public static class JDoodleConnector
+    public class JDoodlePOSTService : IJDoodleService
     {
-
         const string outerLeftTemplate = @"import java.util.Scanner;
                                             public class MyClass { 
                                             public static void main(String args[]) {
@@ -35,26 +31,27 @@ namespace ContestProject
 		                                    System.out.println(MyMethod(input));
 	                                        }";
         const string outerRightTemplate = @" }";
+        const string mediaType = "application/json";
         const string uri = "https://api.jdoodle.com/v1/execute";
 
-        public async static Task<bool> TryCompilate(UserTaskCode userTaskCode)
+        private readonly HttpClient _httpClient;
+
+        public JDoodlePOSTService(HttpClient httpClient)
         {
-            JDoodlePOSTObject jdPOSTObject = new JDoodlePOSTObject(outerLeftTemplate + userTaskCode.Code + outerRightTemplate, userTaskCode.InputParameter);
+            _httpClient = httpClient;
+        }
 
-            dynamic response = await Requests.POST(jdPOSTObject, uri);
+        public async Task<dynamic> TryCompilate(string code, int input)
+        {
+            JDoodlePOSTObject jdPOSTObject = new JDoodlePOSTObject(outerLeftTemplate + code + outerRightTemplate, input);
 
-            bool isSuccess;
-            try
-            {
-                isSuccess = Convert.ToInt32(response.output) == userTaskCode.OutputParameter;
-            }
-            catch
-            {
-                isSuccess = false;
-            }
+            string json = JsonConvert.SerializeObject(jdPOSTObject);
+            HttpContent content = new StringContent(json, Encoding.ASCII, mediaType);
+
+            HttpResponseMessage response = await _httpClient.PostAsync(uri, content);
+            string strResponse = await response.Content.ReadAsStringAsync();
             
-
-            return isSuccess;
+            return JsonConvert.DeserializeObject(strResponse);
         }
 
     }

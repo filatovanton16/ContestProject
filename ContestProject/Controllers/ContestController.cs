@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System;
 using Newtonsoft.Json;
+using ContestProject.Services;
+using System.Text.RegularExpressions;
 
 namespace ContestProject.Controllers
 {
@@ -13,27 +15,27 @@ namespace ContestProject.Controllers
     [Route("api/contest")]
     public class ContestController : Controller
     {
-        private ApplicationContext db;
-
+        DataService dataService;
         private IJDoodleService _JDoodleService;
 
-        public ContestController(ApplicationContext context, IJDoodleService jDoodleService)
+        public ContestController(DataService service, IJDoodleService jDoodleService)
         {
-            db = context;
+            dataService = service;
             _JDoodleService = jDoodleService;
-            FillDatabase();
+
+            dataService.Initialize();
         }
+
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            IEnumerable<string> allTasks = db.ContestTasks.Select(x => x.Name);
-            return allTasks.ToList();
+            return dataService.GetAllTasks().ToList();
         }
 
         [HttpGet("{taskName}")]
         public string Get(string taskName)
         {
-            ContestTask contestTask = db.ContestTasks.FirstOrDefault(contestTask => contestTask.Name == taskName);
+            ContestTask contestTask = dataService.GetContestTask(taskName);
             return JsonConvert.SerializeObject(contestTask.Description);
         }
 
@@ -43,27 +45,11 @@ namespace ContestProject.Controllers
             string result;
             try
             {
-                ContestTask contestTask = db.ContestTasks.FirstOrDefault(contestTask => contestTask.Name == userTaskCode.TaskName);
+                ContestTask contestTask = dataService.GetContestTask(userTaskCode.TaskName);
                 dynamic response = await _JDoodleService.TryCompilate(userTaskCode.Code, contestTask.InputParameter);
+                if (response.statusCode == "200") dataService.SaveUserTask(userTaskCode, contestTask);
 
-                if (response.statusCode == "200")
-                {
-                    SaveUserTaskToDB(userTaskCode, contestTask);
-                    try
-                    {
-                        result = Convert.ToInt32(response.output) == contestTask.OutputParameter ?
-                                                "Success! Memory: " + response.memory + " CPU: " + response.cpuTime :
-                                                "Wrong:(";
-                    }
-                    catch
-                    {
-                        result = "Error: " + response.output;
-                    }
-                }
-                else
-                {
-                    result = "Error: " + response.error;
-                }
+                result = TryCheckAnswer(response, contestTask.OutputParameter);
             }
             catch
             {
@@ -72,61 +58,26 @@ namespace ContestProject.Controllers
             return JsonConvert.SerializeObject(result);
         }
 
-        private void FillDatabase() //In case if the database empty, instead of migration.
+        public string TryCheckAnswer(dynamic response, int output)
         {
-            ContestTask[] initialContestTasks = new ContestTask[4]
+            if (response.statusCode == "200")
             {
-                new ContestTask { Name = "TheSimpliestTask", Description = "You need to just return 1", InputParameter = 0, OutputParameter = 1 },
-                new ContestTask { Name = "VerySimpleTask", Description = "You need to return double input value", InputParameter = 2, OutputParameter = 4 },
-                new ContestTask { Name = "SimpleTask", Description = "You need to return the factorial of the input number", InputParameter = 5, OutputParameter = 120 },
-                new ContestTask { Name = "NormalTask", Description = "You need to get a Fibonaccisequence number by the input index", InputParameter = 5, OutputParameter = 5 }
-            };
+                if (!Regex.IsMatch(response.output.ToString(), "^[^x]+$"))
+                {
 
-            User[] initialUsers = new User[4]
-            {
-                new User { Name = "Anna" },
-                new User { Name = "Bartosz" },
-                new User { Name = "Adam" },
-                new User { Name = "Simon" }
-            };
-
-            if (!db.Users.Any()) db.Users.AddRange(initialUsers);
-
-            if (!db.ContestTasks.Any()) db.ContestTasks.AddRange(initialContestTasks);
-
-            if (!db.UserTasks.Any())
-            {
-                db.UserTasks.Add(new UserTask { User = initialUsers[0], Task = initialContestTasks[3] });
-                db.UserTasks.Add(new UserTask { User = initialUsers[0], Task = initialContestTasks[2] });
-                db.UserTasks.Add(new UserTask { User = initialUsers[0], Task = initialContestTasks[1] });
-                db.UserTasks.Add(new UserTask { User = initialUsers[0], Task = initialContestTasks[0] });
-                db.UserTasks.Add(new UserTask { User = initialUsers[1], Task = initialContestTasks[3] });
-                db.UserTasks.Add(new UserTask { User = initialUsers[1], Task = initialContestTasks[2] });
-                db.UserTasks.Add(new UserTask { User = initialUsers[1], Task = initialContestTasks[1] });
-                db.UserTasks.Add(new UserTask { User = initialUsers[2], Task = initialContestTasks[3] });
-                db.UserTasks.Add(new UserTask { User = initialUsers[2], Task = initialContestTasks[2] });
-                db.UserTasks.Add(new UserTask { User = initialUsers[3], Task = initialContestTasks[3] });
+                    return "Error: " + response.output;
+                }
+                else
+                {
+                    return Convert.ToInt32(response.output) == output ?
+                                            "Success! Memory: " + response.memory + " CPU: " + response.cpuTime :
+                                            "Wrong:(";
+                }
             }
-
-            db.SaveChanges();
-        }
-
-        private void SaveUserTaskToDB(UserTaskCode userTaskCode, ContestTask contestTask)
-        {
-            User user = db.Users.FirstOrDefault(user => user.Name == userTaskCode.UserName);
-            if (user == null)
+            else
             {
-                user = new User { Name = userTaskCode.UserName };
-                db.Users.Add(user);
+                return "Error: " + response.error;
             }
-
-            UserTask userTask = db.UserTasks.FirstOrDefault(userTask => userTask.User.Name == userTaskCode.UserName && userTask.Task.Name == userTaskCode.TaskName);
-            if (userTask == null)
-            {
-                db.UserTasks.Add(new UserTask { User = user, Task = contestTask });
-            }
-
-            db.SaveChanges();
         }
 
     }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ContestProject.Models;
 using System;
 using Microsoft.EntityFrameworkCore;
+using ContestProject.Services;
 
 namespace ContestProject.Controllers
 {
@@ -11,28 +12,15 @@ namespace ContestProject.Controllers
     [Route("api/leaderboard")]
     public class LeaderboardController : Controller
     {
-        ApplicationContext db;
-        const int numberOfTOP = 3;
-        public LeaderboardController(ApplicationContext context)
+        DataService dataService;
+        public LeaderboardController(DataService service)
         {
-            db = context;
+            dataService = service;
         }
         [HttpGet]
         public IEnumerable<UserTaskGroup> Get()
         {
-            var users = db.Users
-                    .Include(u => u.UserTasks)  
-                        .ThenInclude(ut => ut.Task);
-            //TODO: Store the amount of successful tasks in the DB and make here an explicit load through .Where() only for top3
-            var top3UserTasks = users.Select(u => new UserTaskGroup(
-                                                            u.Name,
-                                                            u.UserTasks.Count(),
-                                                            u.UserTasks.Select(ut => ut.Task.Name)
-                                                            ))
-                                      .ToList()
-                                      .OrderByDescending(utg => utg.SolutionsNumber)
-                                      .Take(numberOfTOP);
-            return top3UserTasks;
+            return dataService.GetTop3UserTasks();
         }
     }
 }

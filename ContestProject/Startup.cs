@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using ContestProject.Models;
 using System;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Identity;
+using ContestProject.Services;
 
 namespace ContestProject
 {
@@ -26,6 +26,10 @@ namespace ContestProject
             services.AddControllers();
 
             services.AddHttpClient<IJDoodleService, JDoodlePOSTService>();
+
+            services.AddTransient<DataService>();
+            
+            services.AddMemoryCache();
 
             services.AddSpaStaticFiles(configuration =>
             {

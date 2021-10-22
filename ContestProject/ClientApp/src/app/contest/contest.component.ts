@@ -3,7 +3,8 @@ import { ContestDataService } from './contest.data.service';
 import { UserTaskCode } from './user-task-code';
 
 @Component({
-    templateUrl: './contest.component.html'
+    templateUrl: './contest.component.html',
+    styleUrls: ['./contest.component.css']
 })
 export class ContestComponent implements OnInit {
 

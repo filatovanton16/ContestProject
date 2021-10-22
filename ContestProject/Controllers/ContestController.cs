@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using ContestProject.Models;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System;
 using Newtonsoft.Json;

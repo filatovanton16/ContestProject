@@ -33,7 +33,8 @@ let ContestComponent = class ContestComponent {
 };
 ContestComponent = __decorate([
     Component({
-        templateUrl: './contest.component.html'
+        templateUrl: './contest.component.html',
+        styleUrls: ['./contest.component.css']
     })
 ], ContestComponent);
 export { ContestComponent };

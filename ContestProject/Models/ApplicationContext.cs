@@ -24,6 +24,8 @@ namespace ContestProject.Models
                 .HasOne(ut => ut.Task)
                 .WithMany(t => t.UserTasks)
                 .HasForeignKey(ut => ut.TaskId);
+
+            modelBuilder.Entity<User>().HasIndex(u => u.NumberOfSolved);
         }
 
         public DbSet<ContestTask> ContestTasks { get; set; }

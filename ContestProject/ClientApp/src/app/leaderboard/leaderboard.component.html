@@ -1,4 +1,4 @@
-﻿<table class='table table-striped' aria-labelledby="tableLabel">
+﻿<table class='table table-striped' aria-labelledby="tableLabel" style="text-align: center">
     <thead>
         <tr>
             <th>Name</th>
@@ -10,7 +10,14 @@
         <tr *ngFor="let userTaskGroup of userTaskGroups">
             <td>{{ userTaskGroup.name }}</td>
             <td>{{ userTaskGroup.solutionsNumber }}</td>
-            <td>{{ userTaskGroup.allTasksString }}</td>
+            <td>
+                <details>
+                    <summary>Tap to show/hide all tasks</summary>
+                    <p *ngFor="let contestTask of userTaskGroup.contestTasks">
+                        {{ contestTask}}
+                    </p>
+                </details>
+            </td>
         </tr>
     </tbody>
 </table>

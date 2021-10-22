@@ -1,8 +1,8 @@
 export class UserTaskGroup {
-    constructor(name, solutionsNumber, allTasksString) {
+    constructor(name, solutionsNumber, contestTasks) {
         this.name = name;
         this.solutionsNumber = solutionsNumber;
-        this.allTasksString = allTasksString;
+        this.contestTasks = contestTasks;
     }
 }
 //# sourceMappingURL=user-task-group.js.map

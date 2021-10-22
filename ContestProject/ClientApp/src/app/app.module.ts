@@ -22,7 +22,7 @@ const appRoutes: Routes = [
 @NgModule({
     imports: [BrowserModule, FormsModule, HttpClientModule, RouterModule.forRoot(appRoutes)],
     declarations: [AppComponent, LeaderboardComponent, ContestComponent, NavMenuComponent, NotFoundComponent],
-    providers: [ContestDataService, LeaderboardDataService],
+    providers: [ContestDataService, LeaderboardDataService ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

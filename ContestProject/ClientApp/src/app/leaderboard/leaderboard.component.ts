@@ -3,7 +3,8 @@ import { LeaderboardDataService } from './leaderboard.data.service';
 import { UserTaskGroup } from './user-task-group';
 
 @Component({
-    templateUrl: './leaderboard.component.html'
+    templateUrl: './leaderboard.component.html',
+    styleUrls: ['./leaderboard.component.css']
 })
 export class LeaderboardComponent implements OnInit{
     public userTaskGroups: UserTaskGroup[];

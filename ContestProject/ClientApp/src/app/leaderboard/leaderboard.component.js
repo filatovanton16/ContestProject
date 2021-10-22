@@ -18,7 +18,8 @@ let LeaderboardComponent = class LeaderboardComponent {
 };
 LeaderboardComponent = __decorate([
     Component({
-        templateUrl: './leaderboard.component.html'
+        templateUrl: './leaderboard.component.html',
+        styleUrls: ['./leaderboard.component.css']
     })
 ], LeaderboardComponent);
 export { LeaderboardComponent };

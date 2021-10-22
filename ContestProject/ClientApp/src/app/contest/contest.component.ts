@@ -38,4 +38,6 @@ export class ContestComponent implements OnInit {
         this.info = "WAIT...";
         this.dataService.addUserTask(this.userTaskCode).subscribe((data: string) => { this.info = data });
     }
+
+
 }

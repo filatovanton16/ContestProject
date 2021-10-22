@@ -27,7 +27,7 @@ namespace ContestProject.Controllers
             var top3UserTasks = users.Select(u => new UserTaskGroup(
                                                             u.Name,
                                                             u.UserTasks.Count(),
-                                                            string.Join("\n", u.UserTasks.Select(ut => ut.Task.Name))
+                                                            u.UserTasks.Select(ut => ut.Task.Name)
                                                             ))
                                       .ToList()
                                       .OrderByDescending(utg => utg.SolutionsNumber)

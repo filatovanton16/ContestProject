@@ -2,7 +2,7 @@
     <label>Name</label>
     <input type="text" name="name" [(ngModel)]="userTaskCode.userName" #name="ngModel" class="form-control" required />
     <div *ngIf="name.invalid && (name.dirty || name.touched || runTouched)" class="alert">
-        <div *ngIf="name.errors?.required">
+        <div *ngIf="name.errors?.required" style="color: red;">
             Name is required.
         </div>
     </div>
@@ -25,7 +25,7 @@
     <label>Solution code</label>
     <textarea [(ngModel)]="userTaskCode.code" maxlength="2000" rows="15" class="form-control"></textarea>
 </div>
-<div class="form-group" style="display: inline-block">
+<div class="form-group">
     <input type="button" value="RUN" (click)="saveResult()" class="btn btn-success" />
     <div *ngIf="isRunned">
         <div style="font-size: 24px;">{{info}}</div>

@@ -9,8 +9,8 @@ namespace ContestProject.Controllers
     [Route("api/leaderboard")]
     public class LeaderboardController : Controller
     {
-        DataService dataService;
-        public LeaderboardController(DataService service)
+        IDataService dataService;
+        public LeaderboardController(IDataService service)
         {
             dataService = service;
         }

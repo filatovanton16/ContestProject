@@ -2,5 +2,5 @@
 
 public interface IJDoodleService
 {
-    Task<dynamic> TryCompilate(string code, int input);
+    Task<dynamic> TryCompilateAsync(string code, int input);
 }

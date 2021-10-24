@@ -13,10 +13,10 @@ namespace ContestProject.Controllers
     [Route("api/contest")]
     public class ContestController : Controller
     {
-        DataService dataService;
+        IDataService dataService;
         private IJDoodleService _JDoodleService;
 
-        public ContestController(DataService service, IJDoodleService jDoodleService)
+        public ContestController(IDataService service, IJDoodleService jDoodleService)
         {
             dataService = service;
             _JDoodleService = jDoodleService;
@@ -31,20 +31,20 @@ namespace ContestProject.Controllers
         }
 
         [HttpGet("{taskName}")]
-        public string Get(string taskName)
+        public JsonResult Get(string taskName)
         {
             ContestTask contestTask = dataService.GetContestTask(taskName);
-            return JsonConvert.SerializeObject(contestTask.Description);
+            return Json(contestTask.Description);
         }
 
         [HttpPost]
-        public async Task<string> Post(UserTaskCode userTaskCode)
+        public async Task<JsonResult> Post(UserTaskCode userTaskCode)
         {
             string result;
             try
             {
                 ContestTask contestTask = dataService.GetContestTask(userTaskCode.TaskName);
-                dynamic response = await _JDoodleService.TryCompilate(userTaskCode.Code, contestTask.InputParameter);
+                dynamic response = await _JDoodleService.TryCompilateAsync(userTaskCode.Code, contestTask.InputParameter);
                 if (response.statusCode == "200") dataService.SaveUserTask(userTaskCode, contestTask);
 
                 result = TryCheckAnswer(response, contestTask.OutputParameter);
@@ -53,7 +53,7 @@ namespace ContestProject.Controllers
             {
                 result = "Something went wrong. Please try again.";
             }
-            return JsonConvert.SerializeObject(result);
+            return Json(result);
         }
 
         public string TryCheckAnswer(dynamic response, int output)

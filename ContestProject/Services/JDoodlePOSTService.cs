@@ -41,7 +41,7 @@ namespace ContestProject
             _httpClient = httpClient;
         }
 
-        public async Task<dynamic> TryCompilate(string code, int input)
+        public async Task<dynamic> TryCompilateAsync(string code, int input)
         {
             JDoodlePOSTObject jdPOSTObject = new JDoodlePOSTObject(outerLeftTemplate + code + outerRightTemplate, input);
 

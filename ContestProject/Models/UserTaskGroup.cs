@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 public class UserTaskGroup
 {
@@ -11,5 +12,13 @@ public class UserTaskGroup
         Name = name;
         SolutionsNumber = solutionsNumber;
         ContestTasks = allTasksString;
+    }
+
+    public override bool Equals(object obj)
+    {
+        var secondVar = obj as UserTaskGroup;
+        return secondVar.Name == this.Name
+        && secondVar.SolutionsNumber == this.SolutionsNumber
+        && secondVar.ContestTasks.SequenceEqual(secondVar.ContestTasks);
     }
 }

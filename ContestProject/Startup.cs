@@ -27,7 +27,7 @@ namespace ContestProject
 
             services.AddHttpClient<IJDoodleService, JDoodlePOSTService>();
 
-            services.AddTransient<DataService>();
+            services.AddTransient<IDataService, DataService>();
             
             services.AddMemoryCache();
 

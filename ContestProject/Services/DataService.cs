@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ContestProject.Services
 {
-    public class DataService
+    public class DataService : IDataService
     {
         const int numberOfTOP = 3;
         private ApplicationContext db;

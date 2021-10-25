@@ -6,8 +6,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { Component } from '@angular/core';
 let ContestComponent = class ContestComponent {
-    constructor(dataService) {
+    constructor(dataService, cookieService) {
         this.dataService = dataService;
+        this.cookieService = cookieService;
         this.initCode = "public static int MyMethod(int input) {\nreturn 1;\n}";
         this.isRunned = false;
         this.runTouched = false;
@@ -16,6 +17,9 @@ let ContestComponent = class ContestComponent {
         this.dataService.getTaskNames().subscribe((data) => {
             this.taskNames = data;
             this.userTaskCode = { userName: "", taskName: data[0], code: this.initCode };
+            if (this.cookieService.check('userName')) {
+                this.userTaskCode.userName = this.cookieService.get('userName');
+            }
             this.dataService.getContestTask(this.userTaskCode.taskName).subscribe((data) => this.description = data);
         });
     }
@@ -26,6 +30,7 @@ let ContestComponent = class ContestComponent {
         this.runTouched = true;
         if (this.userTaskCode.userName == "")
             return;
+        this.cookieService.set('userName', this.userTaskCode.userName);
         this.isRunned = true;
         this.info = "WAIT...";
         this.dataService.addUserTask(this.userTaskCode).subscribe((data) => { this.info = data; });

@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { ContestDataService } from './contest.data.service';
 import { UserTaskCode } from './user-task-code';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
     templateUrl: './contest.component.html',
@@ -17,13 +18,19 @@ export class ContestComponent implements OnInit {
     public runTouched: boolean = false;
 
 
-    constructor(private dataService: ContestDataService) {
+    constructor(private dataService: ContestDataService,
+        private cookieService: CookieService) {
     }
 
     ngOnInit() {
         this.dataService.getTaskNames().subscribe((data: string[]) => {
             this.taskNames = data;
             this.userTaskCode = { userName: "", taskName: data[0], code: this.initCode };
+
+            if (this.cookieService.check('userName')) {
+                this.userTaskCode.userName = this.cookieService.get('userName');
+            }
+
             this.dataService.getContestTask(this.userTaskCode.taskName).subscribe((data: string) => this.description = data);
         });
     }
@@ -35,6 +42,7 @@ export class ContestComponent implements OnInit {
     saveResult() {
         this.runTouched = true;
         if (this.userTaskCode.userName == "") return;
+        this.cookieService.set('userName', this.userTaskCode.userName);
         this.isRunned = true;
         this.info = "WAIT...";
         this.dataService.addUserTask(this.userTaskCode).subscribe((data: string) => { this.info = data });

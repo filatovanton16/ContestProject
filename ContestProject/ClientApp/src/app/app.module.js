@@ -16,6 +16,7 @@ import { ContestComponent } from './contest/contest.component';
 import { NotFoundComponent } from './not-found.component';
 import { ContestDataService } from './contest/contest.data.service';
 import { LeaderboardDataService } from './leaderboard/leaderboard.data.service';
+import { CookieService } from 'ngx-cookie-service';
 const appRoutes = [
     { path: 'leaderboard', component: LeaderboardComponent },
     { path: '', component: ContestComponent },
@@ -27,7 +28,7 @@ AppModule = __decorate([
     NgModule({
         imports: [BrowserModule, FormsModule, HttpClientModule, RouterModule.forRoot(appRoutes)],
         declarations: [AppComponent, LeaderboardComponent, ContestComponent, NavMenuComponent, NotFoundComponent],
-        providers: [ContestDataService, LeaderboardDataService],
+        providers: [ContestDataService, LeaderboardDataService, CookieService],
         bootstrap: [AppComponent]
     })
 ], AppModule);

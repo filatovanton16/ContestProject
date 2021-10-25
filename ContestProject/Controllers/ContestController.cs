@@ -40,41 +40,48 @@ namespace ContestProject.Controllers
         [HttpPost]
         public async Task<JsonResult> Post(UserTaskCode userTaskCode)
         {
-            string result;
+            Tuple<bool, string> result = new Tuple<bool, string>(false, "");
             try
             {
                 ContestTask contestTask = dataService.GetContestTask(userTaskCode.TaskName);
                 dynamic response = await _JDoodleService.TryCompilateAsync(userTaskCode.Code, contestTask.InputParameter);
-                if (response.statusCode == "200") dataService.SaveUserTask(userTaskCode, contestTask);
-
-                result = TryCheckAnswer(response, contestTask.OutputParameter);
+                if (response.statusCode == "200")
+                {
+                    result = TryCheckAnswer(response, contestTask.OutputParameter);
+                    if (result.Item1)
+                    {
+                        dataService.SaveUserTask(userTaskCode, contestTask);
+                    }
+                }
             }
             catch
             {
-                result = "Something went wrong. Please try again.";
+                result = new Tuple<bool, string> (false, "Something went wrong. Please try again.");
             }
-            return Json(result);
+            return Json(result.Item2);
         }
 
-        public string TryCheckAnswer(dynamic response, int output)
+        public Tuple<bool, string> TryCheckAnswer(dynamic response, int output)
         {
             if (response.statusCode == "200")
             {
+                // Check if response has any letters
                 if (!Regex.IsMatch(response.output.ToString(), "^[^x]+$"))
                 {
 
-                    return "Error: " + response.output;
+                    return new Tuple<bool, string>(false, "There is an error in your code:\n " + response.output);
                 }
                 else
                 {
-                    return Convert.ToInt32(response.output) == output ?
-                                            "Success! Memory: " + response.memory + " CPU: " + response.cpuTime :
-                                            "Wrong:(";
+                    //If not then comparing to the right answer
+                    return Convert.ToInt32(response.output) == output ? 
+                        new Tuple<bool, string>(true, "Success! Memory: " + response.memory + " CPU: " + response.cpuTime) :
+                        new Tuple<bool, string>(false, "Wrong:(");
                 }
             }
             else
             {
-                return "Error: " + response.error;
+                return new Tuple<bool, string>(false, "Error: " + response.error);
             }
         }
 

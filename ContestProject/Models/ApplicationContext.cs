@@ -12,6 +12,7 @@ namespace ContestProject.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Many-to-many connection between users and tasks
             modelBuilder.Entity<UserTask>()
                 .HasKey(t => new { t.UserId, t.TaskId });
 
@@ -25,6 +26,7 @@ namespace ContestProject.Models
                 .WithMany(t => t.UserTasks)
                 .HasForeignKey(ut => ut.TaskId);
 
+            //Indexation
             modelBuilder.Entity<User>().HasIndex(u => u.NumberOfSolved);
         }
 

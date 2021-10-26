@@ -20,10 +20,14 @@ let ContestComponent = class ContestComponent {
             if (this.cookieService.check('userName')) {
                 this.userTaskCode.userName = this.cookieService.get('userName');
             }
+            if (this.cookieService.check('taskName')) {
+                this.userTaskCode.taskName = this.cookieService.get('taskName');
+            }
             this.dataService.getContestTask(this.userTaskCode.taskName).subscribe((data) => this.description = data);
         });
     }
     chooseTask() {
+        this.cookieService.set('taskName', this.userTaskCode.taskName);
         this.dataService.getContestTask(this.userTaskCode.taskName).subscribe((data) => this.description = data);
     }
     saveResult() {

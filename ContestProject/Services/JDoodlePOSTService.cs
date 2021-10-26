@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace ContestProject
 {
+    //Object for POST JDoodle request
     public class JDoodlePOSTObject
     {
         public string clientId = "2dc5dafe92194a5629efb80069d583a1";   
@@ -22,6 +23,7 @@ namespace ContestProject
 
     public class JDoodlePOSTService : IJDoodleService
     {
+        //constants for code wrapping before sending
         const string outerLeftTemplate = @"import java.util.Scanner;
                                             public class MyClass { 
                                             public static void main(String args[]) {

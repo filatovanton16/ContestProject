@@ -17,6 +17,7 @@ namespace ContestProject.Services
             cache = memoryCache;
         }
 
+        //Database initializing - only by the first launch
         public void Initialize()
         {
             ContestTask[] initialContestTasks = new ContestTask[4];
@@ -33,10 +34,10 @@ namespace ContestProject.Services
 
             if (!db.ContestTasks.Any())
             {
-                initialContestTasks[0] = new ContestTask { Name = "TheSimpliestTask", Description = "You need to just return 1", InputParameter = 0, OutputParameter = 1 };
-                initialContestTasks[1] = new ContestTask { Name = "VerySimpleTask", Description = "You need to return double input value", InputParameter = 2, OutputParameter = 4 };
-                initialContestTasks[2] = new ContestTask { Name = "SimpleTask", Description = "You need to return the factorial of the input number", InputParameter = 5, OutputParameter = 120 };
-                initialContestTasks[3] = new ContestTask { Name = "NormalTask", Description = "You need to get a Fibonaccisequence number by the input index", InputParameter = 5, OutputParameter = 5 };
+                initialContestTasks[0] = new ContestTask { Name = "The Simpliest Task", Description = "You need to just return 1", InputParameter = 0, OutputParameter = 1 };
+                initialContestTasks[1] = new ContestTask { Name = "Very Simple Task", Description = "You need to return double input value", InputParameter = 2, OutputParameter = 4 };
+                initialContestTasks[2] = new ContestTask { Name = "Simple Task", Description = "You need to return the factorial of the input number", InputParameter = 5, OutputParameter = 120 };
+                initialContestTasks[3] = new ContestTask { Name = "Normal Task", Description = "You need to get a Fibonaccisequence number by the input index", InputParameter = 5, OutputParameter = 5 };
                 db.ContestTasks.AddRange(initialContestTasks);
             }
 
@@ -56,22 +57,24 @@ namespace ContestProject.Services
 
         public IEnumerable<UserTaskGroup> GetTop3UserTasks()
         {
+            //Get top 3 users
             var users = db.Users.OrderByDescending(u => u.NumberOfSolved)
                                 .Take(numberOfTOP);
-
+            //return users with the groups of successful tasks
             return users.Select(u =>
                         new UserTaskGroup(u.Name, u.NumberOfSolved, u.UserTasks.Select(ut => ut.Task.Name)));
         }
 
         public void SaveUserTask(UserTaskCode userTaskCode, ContestTask contestTask)
         {
+            //Adding user
             User user = db.Users.FirstOrDefault(user => user.Name == userTaskCode.UserName);
             if (user == null)
             {
                 user = new User { Name = userTaskCode.UserName };
                 db.Users.Add(user);
             }
-
+            //Adding UserTask
             UserTask userTask = db.UserTasks.FirstOrDefault(userTask => userTask.User.Name == userTaskCode.UserName && userTask.Task.Name == userTaskCode.TaskName);
             if (userTask == null)
             {

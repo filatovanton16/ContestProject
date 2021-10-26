@@ -10,6 +10,7 @@ namespace ContestProject.Tests.ServicesTests
         [Fact]
         public async void Test()
         {
+
         }
     }
 }

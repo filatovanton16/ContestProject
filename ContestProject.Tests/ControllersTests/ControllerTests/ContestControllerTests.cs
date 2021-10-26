@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 
-namespace ContestProject.Tests
+namespace ContestProject.Tests.ControllerTests
 {
     public class ContestControllerTests
     {

@@ -7,7 +7,7 @@ using Xunit;
 using System.Text;
 using System.Linq;
 
-namespace ContestProject.Tests
+namespace ContestProject.Tests.ControllerTests
 {
     public class LeaderboardControllerTests
     {
